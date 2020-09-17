@@ -1,0 +1,49 @@
+<p>Welcome to Form Recognizer Demo by Marvin, built with:</p>
+<ul>
+  <li><a href='https://get.asp.net/'>ASP.NET Core</a> and <a href='https://msdn.microsoft.com/en-us/library/67ef8sbd.aspx'>C#</a> for cross-platform server-side code</li>
+  <li><a href='https://angular.io/'>Angular</a> and <a href='http://www.typescriptlang.org/'>TypeScript</a> for client-side code</li>
+  <li><a href='http://getbootstrap.com/'>Bootstrap</a> for layout and styling</li>
+  <li><a href='#'>SignalR</a> for pushing data from API</li>
+</ul>
+<p>Source Code Available at <a href="https://github.com/hmheng/AILabs">https://github.com/hmheng/AILabs</a></p>
+<!--<ul>
+  <li><strong>Client-side navigation</strong>. For example, click <em>Counter</em> then <em>Back</em> to return here.</li>
+  <li><strong>Angular CLI integration</strong>. In development mode, there's no need to run <code>ng serve</code>. It runs in the background automatically, so your client-side resources are dynamically built on demand and the page refreshes when you modify any file.</li>
+  <li><strong>Efficient production builds</strong>. In production mode, development-time features are disabled, and your <code>dotnet publish</code> configuration automatically invokes <code>ng build</code> to produce minified, ahead-of-time compiled JavaScript files.</li>
+</ul>
+<p>The <code>ClientApp</code> subdirectory is a standard Angular CLI application. If you open a command prompt in that directory, you can run any <code>ng</code> command (e.g., <code>ng test</code>), or use <code>npm</code> to install extra packages into it.</p><br/>-->
+<mat-table [dataSource]="dataSource2" class="mat-elevation-z8">
+  <!-- Position Column -->
+  <!--<ng-container matColumnDef="transactionDate">
+    <mat-header-cell *matHeaderCellDef> TransactionDate </mat-header-cell>
+    <mat-cell *matCellDef="let element2"> {{element2.transactionDate}} </mat-cell>
+  </ng-container>-->
+  <!-- Name Column -->
+  <ng-container matColumnDef="merchantName">
+    <mat-header-cell *matHeaderCellDef> MerchantName </mat-header-cell>
+    <mat-cell *matCellDef="let element2"> {{element2.merchantName}} </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="merchantAddress">
+    <mat-header-cell *matHeaderCellDef> MerchantAddress </mat-header-cell>
+    <mat-cell *matCellDef="let element2"> {{element2.merchantAddress}} </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="totalAmount">
+    <mat-header-cell *matHeaderCellDef> TotalAmount </mat-header-cell>
+    <mat-cell *matCellDef="let element2"> {{element2.totalAmount}} </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="subTotalAmount">
+    <mat-header-cell *matHeaderCellDef> SubTotalAmount </mat-header-cell>
+    <mat-cell *matCellDef="let element2"> {{element2.subTotalAmount}} </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="blobUrl">
+    <mat-header-cell *matHeaderCellDef> BlobUrl </mat-header-cell>
+    <mat-cell *matCellDef="let element2"> <a href="{{element2.blobUrl}}" _target="_blank">View</a> </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="displayedColumns2"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: displayedColumns2;"></mat-row>
+</mat-table>

@@ -1,0 +1,23 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Provide sufficient contrast against white background */
+a {
+  color: #0366d6;
+}
+
+code {
+  color: #e01a76;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.immersive-reader-button {
+  background-color: white;
+  margin-top: 5px;
+  border: 1px solid black;
+  float: right;
+}
