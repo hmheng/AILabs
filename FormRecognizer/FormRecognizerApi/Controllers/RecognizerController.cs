@@ -1,4 +1,8 @@
-﻿using FormRecognizerApi.Constants;
+﻿using Azure;
+using Azure.AI.FormRecognizer;
+using Azure.AI.FormRecognizer.Models;
+using Azure.AI.FormRecognizer.Training;
+using FormRecognizerApi.Constants;
 using FormRecognizerApi.Services;
 using FormRecognizerApi.SignalR;
 using FormRecognizerApi.ViewModels;
@@ -25,9 +29,9 @@ namespace FormRecognizerApi.Controllers
         private IBlobService _blobService { get; set; }
         private IFormRecognizerService _formRecognizerService { get; set; }
 
-        public RecognizerController(IConfiguration configuration, 
+        public RecognizerController(IConfiguration configuration,
             IBlobService blobService,
-            IHubContext<PushHub> hubContext, 
+            IHubContext<PushHub> hubContext,
             IFormRecognizerService formRecognizerService)
         {
             _configuration = configuration;
@@ -122,6 +126,7 @@ namespace FormRecognizerApi.Controllers
 
         }
 
+        [Obsolete("version 1 preview api. Please refer to v2")]
         [HttpPost("upload-simple-receipt-and-analyze")]
         public async Task<IActionResult> AnalyzeSimpleReceipt(IFormFile file)
         {
@@ -180,7 +185,7 @@ namespace FormRecognizerApi.Controllers
                     if (!string.IsNullOrWhiteSpace(resultString))
                     {
                         var frResult = JsonConvert.DeserializeObject<ReceiptResultViewModel>(resultString);
-                        if(frResult.Status.ToUpper() != "RUNNING")
+                        if (frResult.Status.ToUpper() != "RUNNING")
                         {
                             isRunning = false;
                             if (frResult.UnderstandingResults.Count() > 0)
@@ -249,7 +254,109 @@ namespace FormRecognizerApi.Controllers
         //{
         //    return new OkObjectResult(new[] { "value2", "value2" });
         //}
+        #region V2.1 preview
+        /// <summary>
+        /// Analyze Layout
+        /// Sample layout: https://raw.githubusercontent.com/Azure-Samples/cognitive-services-REST-api-samples/master/curl/form-recognizer/simple-invoice.png
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("v2.1-pre/analyze-layout")]
+        public async Task<IActionResult> AnalyzeLayout(string layoutUri)
+        {
+            try
+            {
+                FormRecognizerClient recognizerClient = AuthenticateClient();
+                FormPageCollection formPages = await recognizerClient
+                    .StartRecognizeContentFromUri(new Uri(layoutUri))
+                    .WaitForCompletionAsync();
 
+                if (formPages != null)
+                {
+                    return new OkObjectResult(formPages);
+                }
+                return new BadRequestObjectResult("No result");
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult(ex.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Analyze Receipt
+        /// sample receipt: https://docs.microsoft.com/azure/cognitive-services/form-recognizer/media/contoso-allinone.jpg
+        /// </summary>
+        /// <param name="receiptUri"></param>
+        /// <returns></returns>
+        [HttpGet("v2.1-pre/analyze-receipt")]
+        public async Task<IActionResult> AnalyzeReceiptV2(string receiptUri)
+        {
+            try
+            {
+                FormRecognizerClient recognizerClient = AuthenticateClient();
+                RecognizedFormCollection receipts = await recognizerClient.StartRecognizeReceiptsFromUri(new Uri(receiptUri)).WaitForCompletionAsync();
+
+                if (receipts != null)
+                {
+                    return new OkObjectResult(receipts);
+                }
+                return new BadRequestObjectResult("No result");
+            }
+            catch(Exception ex)
+            {
+                return new BadRequestObjectResult(ex.ToString());
+            }
+
+        }
+
+        /// <summary>
+        /// Analyze Business Card
+        /// sample business card: https://raw.githubusercontent.com/Azure/azure-sdk-for-python/master/sdk/formrecognizer/azure-ai-formrecognizer/samples/sample_forms/business_cards/business-card-english.jpg
+        /// </summary>
+        /// <param name="receiptUri"></param>
+        /// <returns></returns>
+        [HttpGet("v2.1-pre/analyze-business-card")]
+        public async Task<IActionResult> AnalyzeBusinessCardV2(string cardUri)
+        {
+            try
+            {
+                FormRecognizerClient recognizerClient = AuthenticateClient();
+                RecognizedFormCollection businessCards = await recognizerClient.StartRecognizeBusinessCardsFromUriAsync(new Uri(cardUri))
+                                                                .WaitForCompletionAsync();
+
+                if (businessCards != null)
+                {
+                    return new OkObjectResult(businessCards);
+                }
+                return new BadRequestObjectResult("No result");
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult(ex.ToString());
+            }
+
+        }
+        #endregion
+
+        #region private
+        private FormRecognizerClient AuthenticateClient()
+        {
+            var apiKey = $"{_configuration["FormRecognizer:Key"]}" ?? "";
+            var endpoint = $"{_configuration["FormRecognizer:Endpoint"]}" ?? "";
+            var credential = new AzureKeyCredential(apiKey);
+            var client = new FormRecognizerClient(new Uri(endpoint), credential);
+            return client;
+        }
+
+        private FormTrainingClient AuthenticateTrainingClient()
+        {
+            var apiKey = $"{_configuration["FormRecognizer:Key"]}" ?? "";
+            var endpoint = $"{_configuration["FormRecognizer:Endpoint"]}" ?? "";
+            var credential = new AzureKeyCredential(apiKey);
+            var client = new FormTrainingClient(new Uri(endpoint), credential);
+            return client;
+        }
+        #endregion
     }
 
 }
